@@ -70,8 +70,7 @@ class Seed:
                     peer='seed_coin_bot',
                     app=InputBotAppShortName(bot_id=await client.get_input_entity('seed_coin_bot'), short_name='app'),
                     platform='ios',
-                    write_allowed=True,
-                    start_param='6094625904'
+                    write_allowed=True
                 ))
                 query = unquote(string=webapp_response.url.split('tgWebAppData=')[1].split('&tgWebAppVersion')[0])
                 await client.disconnect()
@@ -589,8 +588,8 @@ class Seed:
                 response.raise_for_status()
                 detail_member_guild = response.json()
                 if detail_member_guild['data'] is None or detail_member_guild['data']['guild_id'] is None:
-                    return await self.join_guild(query=query, guild_id='b4480be6-0f4a-42d2-8f58-bc087daa33c3')
-                elif detail_member_guild['data']['guild_id'] != 'b4480be6-0f4a-42d2-8f58-bc087daa33c3':
+                    return await self.join_guild(query=query, guild_id='79ddc6f0-aab5-48d6-85ba-0ec20aab960b')
+                elif detail_member_guild['data']['guild_id'] != '79ddc6f0-aab5-48d6-85ba-0ec20aab960b':
                     return await self.leave_guild(query=query, guild_id=detail_member_guild['data']['guild_id'])
         except (JSONDecodeError, RequestException) as e:
             return self.print_timestamp(f"{Fore.RED + Style.BRIGHT}[ An HTTP Error Occurred While Fetching Detail Member Guild: {str(e)} ]{Style.RESET_ALL}")
@@ -625,7 +624,7 @@ class Seed:
         try:
             with Session().post(url=url, headers=headers, data=data) as response:
                 response.raise_for_status()
-                return await self.join_guild(query=query, guild_id='b4480be6-0f4a-42d2-8f58-bc087daa33c3')
+                return await self.join_guild(query=query, guild_id='79ddc6f0-aab5-48d6-85ba-0ec20aab960b')
         except (Exception, JSONDecodeError, RequestException):
             return False
 
