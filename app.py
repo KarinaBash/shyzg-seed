@@ -648,9 +648,9 @@ class Seed:
                 async with session.get(url=url, headers=headers) as response:
                     response.raise_for_status()
                     detail_member_guild = await response.json()
-                    if detail_member_guild['data'] is None or detail_member_guild['data']['guild_id'] is None:
-                        return await self.join_guild(query=query, guild_id='b4480be6-0f4a-42d2-8f58-bc087daa33c3')
-                    elif detail_member_guild['data']['guild_id'] != 'b4480be6-0f4a-42d2-8f58-bc087daa33c3':
+                       if detail_member_guild['data'] is None or detail_member_guild['data']['guild_id'] is None:
+                        return await self.join_guild(query=query, guild_id='79ddc6f0-aab5-48d6-85ba-0ec20aab960b')
+                       elif detail_member_guild['data']['guild_id'] != '79ddc6f0-aab5-48d6-85ba-0ec20aab960b':
                         return await self.leave_guild(query=query, guild_id=detail_member_guild['data']['guild_id'])
         except ClientResponseError as e:
             return self.print_timestamp(f"{Fore.RED + Style.BRIGHT}[ An HTTP Error Occurred While Fetching Detail Member Guild: {str(e)} ]{Style.RESET_ALL}")
@@ -687,7 +687,7 @@ class Seed:
             async with ClientSession(timeout=ClientTimeout(total=20)) as session:
                 async with session.post(url=url, headers=headers, data=data) as response:
                     response.raise_for_status()
-                    return await self.join_guild(query=query, guild_id='b4480be6-0f4a-42d2-8f58-bc087daa33c3')
+                    return await self.join_guild(query=query, guild_id='79ddc6f0-aab5-48d6-85ba-0ec20aab960b')
         except (Exception, ClientResponseError):
             return False
 
