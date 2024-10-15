@@ -1,7 +1,11 @@
+from aiohttp import (
+    ClientResponseError,
+    ClientSession,
+    ClientTimeout
+)
 from colorama import *
 from datetime import datetime, timedelta
 from fake_useragent import FakeUserAgent
-from faker import Faker
 from telethon.errors import (
     AuthKeyUnregisteredError,
     UserDeactivatedError,
@@ -10,11 +14,9 @@ from telethon.errors import (
 )
 from telethon.functions import messages, account
 from telethon.sync import TelegramClient
-from telethon.types import InputBotAppShortName, AppWebViewResultUrl
-from aiohttp import (
-    ClientResponseError,
-    ClientSession,
-    ClientTimeout
+from telethon.types import (
+    InputBotAppShortName,
+    AppWebViewResultUrl
 )
 from urllib.parse import unquote
 import asyncio, json, os, sys
@@ -29,7 +31,6 @@ class Seed:
         self.price_legendary_worm=config['price_legendary_worm']
         self.price_epic_worm=config['price_epic_worm']
         self.price_rare_worm=config['price_rare_worm']
-        self.faker = Faker()
         self.headers = {
             'Accept': '*/*',
             'Accept-Language': 'en-GB,en-US;q=0.9,en;q=0.8',
@@ -59,14 +60,16 @@ class Seed:
         try:
             client = TelegramClient(session=f'sessions/{session}', api_id=self.api_id, api_hash=self.api_hash)
             try:
-                await client.connect()
-                me = await client.get_me()
-                first_name = me.first_name if me.first_name is not None else me.username
-                id = me.id
-                if me.last_name is None or not '🌱SEED' in me.last_name:
-                    await client(account.UpdateProfileRequest(last_name='🌱SEED'))
+                if not client.is_connected():
+                    await client.connect()
             except (AuthKeyUnregisteredError, UnauthorizedError, UserDeactivatedBanError, UserDeactivatedError) as e:
                 raise e
+
+            me = await client.get_me()
+            first_name = me.first_name if me.first_name is not None else me.username
+            id = me.id
+
+            if me.last_name is None or not '🌱SEED' in me.last_name: await client(account.UpdateProfileRequest(last_name='🌱SEED'))
 
             webapp_response: AppWebViewResultUrl = await client(messages.RequestAppWebViewRequest(
                 peer='seed_coin_bot',
@@ -76,12 +79,14 @@ class Seed:
                 start_param='6094625904'
             ))
             query = unquote(string=webapp_response.url.split('tgWebAppData=')[1].split('&tgWebAppVersion')[0])
+            
+            if client.is_connected():
+                await client.disconnect()
 
-            await client.disconnect()
             return (query, first_name, id)
         except Exception as e:
-            self.print_timestamp(f"{Fore.RED + Style.BRIGHT}[ {session} Unexpected Error While Generating Query With Telethon: {str(e)} ]{Style.RESET_ALL}")
             await client.disconnect()
+            self.print_timestamp(f"{Fore.RED + Style.BRIGHT}[ {session} Unexpected Error While Generating Query With Telethon: {str(e)} ]{Style.RESET_ALL}")
             return None
 
     async def generate_queries(self, sessions):
@@ -276,7 +281,8 @@ class Seed:
                         self.print_timestamp(f"{Fore.YELLOW + Style.BRIGHT}[ Ticket {spin['id']} ]{Style.RESET_ALL}")
                         await self.spin_reward(query=query, ticket_id=spin['id'])
                         await asyncio.sleep(2)
-                    await self.egg_piece(query=query, id=id)
+                    if id != self.id_telegram_primary_account:
+                        await self.egg_piece(query=query, id=id)
         except ClientResponseError as e:
             return self.print_timestamp(f"{Fore.RED + Style.BRIGHT}[ An HTTP Error Occurred While Fetching Spin Ticket: {str(e)} ]{Style.RESET_ALL}")
         except Exception as e:
@@ -346,6 +352,8 @@ class Seed:
                         error_message_egg_piece_merge = await response.json()
                         if error_message_egg_piece_merge['message'] == 'you can only fuse twice a day':
                             return self.print_timestamp(f"{Fore.RED + Style.BRIGHT}[ You Can Only Fuse Twice A Day ]{Style.RESET_ALL}")
+                        elif error_message_egg_piece_merge['message'] == 'you don\'t have enough seeds':
+                            return self.print_timestamp(f"{Fore.RED + Style.BRIGHT}[ You Don\'t Have Enough Seeds ]{Style.RESET_ALL}")
                     response.raise_for_status()
                     egg_piece_merge = await response.json()
                     if egg_piece_merge['data']['status'] == 'in-inventory':
