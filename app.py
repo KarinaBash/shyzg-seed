@@ -901,15 +901,15 @@ class Seed:
                     )
                     await self.is_leader_bird(query=query)
 
-                if os.getenv('AUTO_UPGRADE') == 'True':
-                    for (query, name, id) in accounts:
-                        self.print_timestamp(
-                            f"{Fore.WHITE + Style.BRIGHT}[ Boost ]{Style.RESET_ALL}"
-                            f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
-                            f"{Fore.CYAN + Style.BRIGHT}[ {name} ]{Style.RESET_ALL}"
-                        )
-                        await self.upgrade_mining_seed(query=query)
-                        await self.upgrade_storage_size(query=query)
+                # if os.getenv('AUTO_UPGRADE') == 'True':
+                #     for (query, name, id) in accounts:
+                #         self.print_timestamp(
+                #             f"{Fore.WHITE + Style.BRIGHT}[ Boost ]{Style.RESET_ALL}"
+                #             f"{Fore.WHITE + Style.BRIGHT} | {Style.RESET_ALL}"
+                #             f"{Fore.CYAN + Style.BRIGHT}[ {name} ]{Style.RESET_ALL}"
+                #         )
+                #         await self.upgrade_mining_seed(query=query)
+                #         await self.upgrade_storage_size(query=query)
 
                 if os.getenv('AUTO_SPIN') == 'True':
                     for (query, name, id) in accounts:
